@@ -29,6 +29,7 @@ const Chat: React.FC = () => {
     socketRef.current = io('http://localhost:3001', {
       auth: {
         token,
+        username: user.name,
       },
     });
 
@@ -36,6 +37,18 @@ const Chat: React.FC = () => {
       console.log('Mensaje recibido:', data);
       setMessageList(prev => [...prev, data]);
     });
+
+    socketRef.current.on('user_connected', (data: { message: string }) => {
+    setMessageList(prev => [
+      ...prev,
+      {
+        room: room,
+        author: 'Sistema',
+        message: data.message,
+        time: new Date().toLocaleTimeString(),
+      }
+    ]);
+  });
 
     socketRef.current.on('status', (data) => {
       console.debug('Estado recibido:', data);
